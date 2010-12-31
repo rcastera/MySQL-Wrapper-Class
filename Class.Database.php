@@ -3,7 +3,6 @@
  * @uses        MySQL Wrapper Class in PHP5
  * @author      Richard Castera
  * @link        http://www.richardcastera.com/projects/mysql-wrapper-class-in-php5
- * @date        8/21/2008
  * @version     0.06
  * @copyright   Richard Castera 2010 Copyright 
  * @access      Public
