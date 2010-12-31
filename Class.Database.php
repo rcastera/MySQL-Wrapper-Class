@@ -64,7 +64,9 @@ class Database {
 		  throw new Exception('Invalid parameter values to establish connection.');
 		}
     else {
-      $this->connect($host, $database = '', $username, $password, $persistent);
+      if(!$this->connect($host, $database, $username, $password, $persistent)) {
+        throw new Exception('Could not establish a connection.');
+      }
     }
 	}
 	
@@ -108,7 +110,7 @@ class Database {
       } 
 
       // If we couldn't select the database, return false.
-      if(!$this->selectDb()) {
+      if(!$this->selectDb($database)) {
         return FALSE;
       } 
       // Connection was a success.
@@ -125,12 +127,12 @@ class Database {
   /**
    * @uses		Selects the database.
    * @access	Private
-   * @param	  None.
+   * @param   String $database - The database to connect to.
    * @return  True for success, False if not.
    */ 
-  private function selectDb() {
+  private function selectDb($database) {
     // If there was an error selecting the database, return false.	
-    if(!mysql_selectDb(DB_NAME, $this->linkId)) {	
+    if(!mysql_select_db($database, $this->linkId)) {	
       return FALSE;
     }
     else {
@@ -175,8 +177,7 @@ class Database {
           // Which query was run.
           switch($this->getQueryType()) {
             case 'INSERT':
-              $intId = $this->getLastInsertId();
-              return $intId;
+              return $this->getLastInsertId();
               break;
       
             case 'UPDATE':
@@ -229,13 +230,7 @@ class Database {
       if($this->queryType == 'INSERT') {
         $this->lastInsertId = mysql_insert_id();
       }
-  
-      // Return the query result.
-      return $this->queryResult;
-    } 
-    else {				
-      return FALSE;
-    }	  
+    }  
   }
 
 
