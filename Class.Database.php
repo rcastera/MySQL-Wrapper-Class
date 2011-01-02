@@ -86,7 +86,7 @@ class Database {
 
   /**
    * @uses		Connects to the database specified.
-   * @access	Public
+   * @access	Private
    * @param   String $host - The host to connect to.
    * @param   String $database - The database to connect to.
    * @param   String $username - The username of the db to connect to.
@@ -212,7 +212,7 @@ class Database {
 
   /**
    * @uses		Executes a sql query.
-   * @access	Public
+   * @access	Private
    * @param	  String $strSqlStatement - The sql statement.
    * @return  True for success, False if not.
    */ 
@@ -246,7 +246,7 @@ class Database {
 
   /**
    * @uses		Free result memory.
-   * @access	Public
+   * @access	Private
    * @param	  None.
    * @return  Returns True on success or False on failure. .
    */ 
