@@ -1,1 +1,0 @@
-This is a class that I've used in my projects for years. It's a simple wrapper to MySQL written in PHP5 that allows you to connect, run queries and get results. It's been used in production sites for some time now and I've re-factored it several times.

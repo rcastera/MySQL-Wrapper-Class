@@ -1,102 +1,78 @@
 <?php
 /**
- * @uses        MySQL Wrapper Class in PHP5
- * @author      Richard Castera
- * @link        http://www.richardcastera.com/projects/mysql-wrapper-class-in-php5
- * @version     0.06
- * @copyright   Richard Castera 2010 Copyright 
- * @access      Public
- * @see         http://php.net/manual/en/book.mysql.php
- * @license     GNU LESSER GENERAL Public LICENSE
+ * MySQL Wrapper Class in PHP5
+ * @author Richard Castera
+ * @link http://www.richardcastera.com/projects/mysql-wrapper-class-in-php5
+ * @see http://php.net/manual/en/book.mysql.php
+ * @license GNU LESSER GENERAL Public LICENSE
  */
  
 class Database {
-
-
-	/**
-   * @uses    The link id to current connection.
-   * @access  Private
-   * @var     Variant
+  /**
+   * The link id to current connection.
+   * @var Variant
    */ 
-	private $linkId = NULL;
- 	
+  private $linkId = NULL;
   
   /**
-   * @uses    The result from the last query executed.
-   * @access  Private
-   * @var     Variant
+   * The result from the last query executed.
+   * @var Variant
    */
   private $queryResult;
- 	
   
   /**
-   * @uses    The first word in a query (ex: SELECT, INSERT, UPDATE, DELETE).
-   * @access  Private
-   * @var     String
+   * The first word in a query (ex: SELECT, INSERT, UPDATE, DELETE).
+   * @var String
    */
   private $queryType;
- 	
   
   /**
-   * @uses    The last insert id.
-   * @access  Private
-   * @var     Integer
+   * The last insert id.
+   * @var Integer
    */
   private $lastInsertId;
- 	
- 	 	
-    
-    
-    
-	/**
-   * @uses    Constructor.
-   * @access	Public
-   * @param   String $host - The host to connect to.
-   * @param   String $database - The database to connect to.
-   * @param   String $username - The username of the db to connect to.
-   * @param   String $password - The password of the db to connect to.
-   * @param   Boolean $persistent - Is this a persistent connection or not.
-   * @return  None.
+  
+  /**
+   * Constructor.
+   * @param String $host - The host to connect to.
+   * @param String $database - The database to connect to.
+   * @param String $username - The username of the db to connect to.
+   * @param String $password - The password of the db to connect to.
+   * @param Boolean $persistent - Is this a persistent connection or not.
    */ 
-	public function __construct($host = 'localhost', $database = '', $username = '', $password = '', $persistent = FALSE) {
-		if(empty($database) && empty($username) && empty($password)) {
-		  throw new Exception('Invalid parameter values to establish connection.');
-		}
+  public function __construct($host = 'localhost', $database = '', $username = '', $password = '', $persistent = FALSE) {
+    if (empty($database) && empty($username) && empty($password)) {
+      trigger_error('Invalid parameter values to establish connection.', E_USER_ERROR);
+    }
     else {
-      if(!$this->connect($host, $database, $username, $password, $persistent)) {
-        throw new Exception('Could not establish a connection.');
+      if (!$this->connect($host, $database, $username, $password, $persistent)) {
+        trigger_error('Could not establish a connection.', E_USER_ERROR);
       }
     }
-	}
-	
+  }
 
   /**
-   * @uses		Destructor - Disconnects from the database.
-   * @access	Public
-   * @param	  None.
-   * @return  None.
+   * Destructor - Disconnects from the database.
    */ 
   public function __destruct() {
-    if($this->linkId) {
+    if ($this->linkId) {
       mysql_close($this->linkId);
     }
     unset($this);
   }
 
-
   /**
-   * @uses		Connects to the database specified.
-   * @access	Private
-   * @param   String $host - The host to connect to.
-   * @param   String $database - The database to connect to.
-   * @param   String $username - The username of the db to connect to.
-   * @param   String $password - The password of the db to connect to.
-   * @param   Boolean $persistent - Is this a persistent connection or not.
-   * @return  True if connected, False if not.
+   * Establishes a connection to the database specified.
+   * @param String $host - The host to connect to.
+   * @param String $database - The database to connect to.
+   * @param String $username - The username of the db to connect to.
+   * @param String $password - The password of the db to connect to.
+   * @param Boolean $persistent - Is this a persistent connection or not.
+   * @return Boolean True if connected, False if not.
    */  
   private function connect($host, $database, $username, $password, $persistant) {
-    if(is_null($this->linkId)) {
-      if($persistant) {
+    if (is_null($this->linkId)) {
+      if ($persistant) {
         $this->linkId = mysql_pconnect($host, $username, $password, FALSE);
       }
       else { 
@@ -104,12 +80,13 @@ class Database {
       }
 
       // If there was an error establishing a connection, return false.
-      if(!is_resource($this->linkId))  {
+      if (!is_resource($this->linkId))  {
         return FALSE;
       } 
 
       // If we couldn't select the database, return false.
-      if(!$this->selectDb($database)) {
+      if (!$this->selectDb($database)) {
+        trigger_error('Could not connect to database.', E_USER_ERROR);
         return FALSE;
       } 
       // Connection was a success.
@@ -118,20 +95,19 @@ class Database {
       }
     }
     else {
-      return;
+      // Assume we already have a connection.
+      return TRUE;
     }
   }
 
-
   /**
-   * @uses		Selects the database.
-   * @access	Private
-   * @param   String $database - The database to connect to.
-   * @return  True for success, False if not.
+   * Selects the database.
+   * @param String $database - The database to connect to.
+   * @return Boolean True for success, False if not.
    */ 
   private function selectDb($database) {
-    // If there was an error selecting the database, return false.	
-    if(!mysql_select_db($database, $this->linkId)) {	
+    // If there was an error selecting the database, return false.  
+    if (!mysql_select_db($database, $this->linkId)) {  
       return FALSE;
     }
     else {
@@ -139,153 +115,88 @@ class Database {
     }
   }
   
-  
   /**
-   * @uses		Retrieves the last error.
-   * @access	Public
-   * @param	  None.
-   * @return  String - Returns the error text from the last MySQL function, or empty string if no error occurred. 
+   * Retrieves the last error.
+   * @return String The error text from the last MySQL function, or empty string if no error occurred. 
    */ 
   public function getError() {
     return mysql_error($this->linkId);
   }
 
-
   /**
-   * @uses		Executes a command on the database.
-   * @access	Public
-   * @param	  String $strQuery - the query to run.
-   * @return  If True returns an array of rows. False if no rows.
+   * Executes a command on the database.
+   * @param String $sql - the query to run.
+   * @return Mixed If True returns an array of rows. False if no rows.
    */ 
-  public function executeQuery($strQuery = '') {
+  public function executeQuery($sql = '') {
     // Check to see that the parameters are not empty.
-    if(!empty($strQuery)) {
+    if (!empty($sql)) {
   
       // Execute the query.
-      $this->runQuery($strQuery);
-    
-      // Check if the query succeeded.
-      if($this->querySucceeded()) {
-    
-        //If the query returned 0 rows, the query returned nothing.
-        if($this->getAffectedRows() == 0) {
-          return FALSE;
-        }
-        else { // If the query returned a value greater than 0. Return the rows.
-    
-          // Which query was run.
-          switch($this->getQueryType()) {
-            case 'INSERT':
-              return $this->getLastInsertId();
-              break;
-      
-            case 'UPDATE':
-              return TRUE;
-              break;
-      
-            case 'REPLACE':
-              return TRUE;
-              break;
-      
-            case 'DELETE':
-              return TRUE;
-              break;
-      
-            default:
-              // Get the rows.
-              return $this->getRows();
-              break;
-          }
-        }
-      }
-      // The query failed.
-      else {
-        return FALSE;
-      }
+      $this->runQuery($sql);
+
+      return $this;
     }
     // Parameters are empty.
     else {
-      return FALSE;
+      trigger_error('You need to provide a query.', E_USER_ERROR);
     }
   }
 
-
   /**
-   * @uses		Executes a sql query.
-   * @access	Private
-   * @param	  String $strSqlStatement - The sql statement.
-   * @return  True for success, False if not.
+   * Executes a sql query.
+   * @param String $query - The sql statement.
+   * @return Boolean True for success, False if not.
    */ 
-  private function runQuery($strSqlStatement = NULL) {
+  private function runQuery($query = NULL) {
     // Check to see if the sql statement variable is set. 
-    if(!is_null($strSqlStatement)) {
+    if (!is_null($query)) {
       // Determine the query type. (SELECT, UPDATE, INSERT, DELETE etc.)
-      $this->queryType = $this->queryType($strSqlStatement);
-  
-      // Run the query.
-      $this->queryResult = mysql_query($strSqlStatement, $this->linkId);
+      $this->queryType = $this->getQueryType($query);
+      
+      if (!$this->queryResult = mysql_query($query, $this->linkId)) {
+        trigger_error('Error in sql query.', E_USER_ERROR);
+      }
   
       // Check if the query is an insert. If it is, get the id.
-      if($this->queryType == 'INSERT') {
+      if ($this->queryType == 'INSERT') {
         $this->lastInsertId = mysql_insert_id();
       }
     }  
   }
 
-
   /**
-   * @uses		Gets the last insert id.
-   * @access	Public
-   * @param	  None.
-   * @return  Variant - The ID generated for an AUTO_INCREMENT column or False.
+   * Gets the last insert id.
+   * @return Variant The ID generated for an AUTO_INCREMENT column or False.
    */ 
   public function getLastInsertId() {
-    return $this->lastInsertId;	  
+    return $this->lastInsertId;   
   }
 
-
   /**
-   * @uses		Free result memory.
-   * @access	Private
-   * @param	  None.
-   * @return  Returns True on success or False on failure. .
+   * Free result memory.
+   * @return Returns True on success or False on failure.
    */ 
   private function freeResult() {
-    return mysql_free_result($this->queryResult);	  
+    return mysql_free_result($this->queryResult);   
   }
 
-
   /**
-   * @uses		To determine the query type used in the query. ex: SELECT, INSERT. In order to run the getAffectedRows(); function below we need to determine the query type.
-   * @access	Private
-   * @param	  String $strSqlStatement - The sql statement.
-   * @return  String - The first word in the query.
+   * To determine the query type used in the query. ex: SELECT, INSERT. In order to run the getAffectedRows(); function below we need to determine the query type.
+   * @param String $query - The sql statement.
+   * @return String The first word in the query.
    */ 
-  private function queryType($strSqlStatement = '') {
-    $arrQuery = explode(' ', $strSqlStatement);
-    return strtoupper($arrQuery[0]);	  
+  private function getQueryType($query = '') {
+    $query = explode(' ', $query);
+    return strtoupper($query[0]);    
   }
 
-
   /**
-   * @uses		Gets the query type.
-   * @access	Public
-   * @param	  None.
-   * @return  The query type.
-   */ 
-  public function getQueryType() {
-    return $this->queryType;	  
-  }
-
-
-  /**
-   * @uses		Verifies that the last query executed successfully.
-   * @access	Public
-   * @param	  None.
-   * @return  True if the last query executed, False if not.
+   * Verifies that the last query executed successfully.
+   * @return True if the last query executed, False if not.
    */ 
   public function querySucceeded() {
-    if(!$this->queryResult) {
+    if (!$this->queryResult) {
       return FALSE;
     }
     else {
@@ -293,17 +204,14 @@ class Database {
     } 
   }
 
-
   /**
-   * @uses		Gets the number of rows affected by the last query executed.
-   * @access	Public
-   * @param	  None.
-   * @return  Integer - The number of rows affected
+   * Gets the number of rows affected by the last query executed.
+   * @return Integer - The number of rows affected.
    */ 
   public function getAffectedRows() {
-    if($this->querySucceeded()) {
+    if ($this->querySucceeded()) {
       // Retrieves the number of rows from a result set. This command is only valid for statements like SELECT or SHOW that return an actual result set. 
-      if(($this->queryType == 'SELECT') || ($this->queryType == 'SHOW')) {
+      if (($this->queryType == 'SELECT') || ($this->queryType == 'SHOW')) {
         return mysql_num_rows($this->queryResult);
       }
       else {
@@ -312,37 +220,98 @@ class Database {
       }
     }
     else {
-      return 0;	
+      return 0; 
     }
   }
 
+  /**
+   * Verifies that the current INSERT sql call ran successfully.
+   * @return Mixed The last insert id if successful, false if not.
+   */
+  public function wasInserted() {
+    if ($this->queryType == 'INSERT' && $this->querySucceeded()) {
+      return $this->getLastInsertId();
+    }
+    else {
+      return FALSE;
+    }
+  }
 
   /**
-   * @uses		Gets all rows based by the last query executed.
-   * @access	Public
-   * @param	  None.
-   * @return  Array - An array of rows based on the last query executed.
-   */ 
-  public function getRows() {
+   * Verifies that the current UPDATE sql call ran successfully.
+   * @return Boolean True if successful, false if not.
+   */
+  public function wasUpdated() {
+    if ($this->queryType == 'UPDATE' && $this->querySucceeded()) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+  
+  /**
+   * Verifies that the current DELETE sql call ran successfully.
+   * @return Boolean True if successful, false if not.
+   */
+  public function wasDeleted() {
+    if ($this->queryType == 'DELETE' && $this->querySucceeded()) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Return the result as an array.
+   * @return Mixed An array of rows if succcessful, false if not.
+   */
+  public function asArray() {
     // If the last query ran was unsuccessfull, then return false.
-    if(!$this->queryResult) {	
+    if (!$this->queryResult) { 
       return FALSE;
     }
     else {
-      if(!$this->getAffectedRows() == 0) {
-        $arrRows = array();
+      if (!$this->getAffectedRows() == 0) {
+        $rows = array();
   
-        while($row = mysql_fetch_assoc($this->queryResult)) {
-          array_push($arrRows, $row); 
+        while ($row = mysql_fetch_assoc($this->queryResult)) {
+          array_push($rows, $row); 
         }
   
         $this->freeResult();
-        return $arrRows;
+        return $rows;
       }
       else {
-        return FALSE;	
+        return FALSE; 
+      }
+    }
+  }
+
+  /**
+   * Return the result as an object.
+   * @return Mixed An array of object rows if succcessful, false if not.
+   */
+  public function asObject() {
+    // If the last query ran was unsuccessfull, then return false.
+    if (!$this->queryResult) { 
+      return FALSE;
+    }
+    else {
+      if (!$this->getAffectedRows() == 0) {
+        $rows = array();
+  
+        while ($row = mysql_fetch_object($this->queryResult)) {
+          array_push($rows, $row); 
+        }
+  
+        $this->freeResult();
+        return $rows;
+      }
+      else {
+        return FALSE; 
       }
     } 
   }
 }
-?>
