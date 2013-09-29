@@ -38,9 +38,9 @@ Then you need to `use` the relevant class, and instantiate the class. For exampl
 ```php
 require 'vendor/autoload.php';
 
-use rcastera\Mysql\Database;
+use rcastera\Database\Mysql\Mysql;
 
-$db = new Database('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
+$db = new Mysql('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
 ```
 
 
@@ -51,8 +51,8 @@ $db = new Database('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
 ```php
 <?php
     require 'vendor/autoload.php';
-    use rcastera\Mysql\Database;
-    $db = new Database('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
+    use rcastera\Database\Mysql\Mysql;
+    $db = new Mysql('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
 ?>
 <?php $contacts = $db->executeQuery('SELECT * FROM contacts')->asObject(); ?>
 <?php if ($contacts): ?>
@@ -71,8 +71,8 @@ $db = new Database('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
 ```php
 <?php
     require 'vendor/autoload.php';
-    use rcastera\Mysql\Database;
-    $db = new Database('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
+    use rcastera\Database\Mysql\Mysql;
+    $db = new Mysql('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
 ?>
 <?php $inserted = $db->executeQuery('INSERT INTO contacts (first_name, last_name, email) VALUES ("Isabella", "Castera", "email@domain.com")')->wasInserted(); ?>
     <?php if ($inserted): ?>
@@ -87,8 +87,8 @@ $db = new Database('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
 ```php
 <?php
     require 'vendor/autoload.php';
-    use rcastera\Mysql\Database;
-    $db = new Database('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
+    use rcastera\Database\Mysql\Mysql;
+    $db = new Mysql('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
 ?>
 <?php $deleted = $db->executeQuery('DELETE FROM contacts WHERE first_name = "Isabella"')->wasDeleted(); ?>
     <?php if ($deleted): ?>
@@ -103,8 +103,8 @@ $db = new Database('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
 ```php
 <?php
     require 'vendor/autoload.php';
-    use rcastera\Mysql\Database;
-    $db = new Database('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
+    use rcastera\Database\Mysql\Mysql;
+    $db = new Mysql('localhost', 'DATABASE', 'USERNAME', 'PASSWORD');
 ?>
 <?php $updated = $db->executeQuery('UPDATE contacts SET last_name = "Branson" WHERE first_name = "Richard"')->wasUpdated(); ?>
     <?php if ($updated): ?>

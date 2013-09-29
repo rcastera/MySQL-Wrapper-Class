@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace rcastera\Mysql;
+namespace rcastera\Database\Mysql;
 
-class Database
+class Mysql
 {
     /**
      * Link id to current connection.
